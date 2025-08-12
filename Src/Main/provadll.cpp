@@ -5,7 +5,7 @@
 #include <endpointvolume.h>
 
 
-extern "C" __declspec(dllexport) void Volume(int a, int b, int c)
+extern "C" __declspec(dllexport) void Volume(int Control, int Data, int State)
 {
     // Inizializza COM
     HRESULT hr = CoInitialize(NULL);
@@ -42,11 +42,11 @@ extern "C" __declspec(dllexport) void Volume(int a, int b, int c)
         return;
     }
 
-    hr = pEndpointVolume->SetMasterVolumeLevelScalar(static_cast<float>(b)/127, NULL);
+    hr = pEndpointVolume->SetMasterVolumeLevelScalar(static_cast<float>(Data)/127, NULL);
     if (FAILED(hr)) {
         std::cerr << "SetMasterVolumeLevelScalar fallita: " << std::hex << hr << std::endl;
     } else {
-        std::cout << "[+] Volume impostato a " << (int)((float)(b)) << "%" << std::endl;
+        std::cout << "[+] Volume impostato a " << (int)((float)(Data)) << "%" << std::endl;
     }
 
     // Cleanup

@@ -32,20 +32,25 @@ It delivers high performance and allows any user (with basic programming knowled
 ## How to Create a Plugin
 1. Create a `.cpp` file with functions following this signature:
    ```cpp
-   void FunctionName(int a, int b, int c)
-a: the command (e.g., a controller button)
+   extern "C" __declspec(dllexport) void Volume(int Control, int Data, int State)
+Control: the command (e.g., a controller button)
 
-b: the data value (e.g., analog stick value)
+Data: the data value (e.g., analog stick value)
 
-c: the state (e.g., button pressed or released)
+State: the state (e.g., button pressed or released)
 
 Implement your desired algorithm inside the function body.
 
-Compile the file into a .dll and place it in /Plugins/.
+Compile the file into a .dll and place it in /Plugins/. 
+es. ```bash
+    g++ -shared -o /path/for/dll /path/to/cpp -lole32 -luuid -static-libgcc "-Wl,--out-implib,libmialib.a"
 
 Add the file name and function names to the .json file.
-
-Technical Details
+es. ```json
+    "Volume.dll": [
+        "Volume"
+    ]
+##Technical Details
 - Uses Dear ImGui with OpenGL, ensuring high performance.
 
 - Optimized for minimized window usage: in this mode, rendering is reduced to one frame every 150 ms to lower CPU usage, while keeping commands active via separate threads.
