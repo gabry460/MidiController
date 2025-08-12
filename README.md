@@ -42,17 +42,19 @@ State: the state (e.g., button pressed or released)
 Implement your desired algorithm inside the function body.
 
 Compile the file into a .dll and place it in /Plugins/. 
-es. ```bash
-    g++ -shared -o /path/for/dll /path/to/cpp -lole32 -luuid -static-libgcc "-Wl,--out-implib,libmialib.a"
-    ```
-
+es.
+ ```bash
+    g++ -shared -o /path/for/dll /path/to/cpp -lole32 -luuid -static-libgcc "-Wl,--out-implib,libmialib.a" 
+```
+    
 Add the file name and function names to the .json file.
-es. ```json
+es. 
+```json
 
     "Volume.dll": [
         "Volume"
     ]
-    ```
+```
 ##Technical Details
 - Uses Dear ImGui with OpenGL, ensuring high performance.
 
