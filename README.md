@@ -55,7 +55,7 @@ es.
         "Volume"
     ]
 ```
-##Technical Details
+## Technical Details
 - Uses Dear ImGui with OpenGL, ensuring high performance.
 
 - Optimized for minimized window usage: in this mode, rendering is reduced to one frame every 150 ms to lower CPU usage, while keeping commands active via separate threads.
