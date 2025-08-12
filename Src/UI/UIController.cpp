@@ -108,36 +108,38 @@ void UIController::start()
         ImGui::NewFrame();
         
         UINT currentDevCount = devCount.load();
+
+        //dev.setMap(this->FuncitionMap);
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(450, 350));
+        float pad = 4.0f;
+        float button_size = 20.0f;
+        ImGui::Begin("Gestione MIDI", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
+        ImGui::Text("Midi Controller");
+        ImGui::SameLine(388);
+        ImGui::SetCursorPosY(4);
+        if(ImGui::Button("-", ImVec2(30,30)))
+        {
+            glfwIconifyWindow(this->getWindow());
+        }
+        if(glfwGetWindowAttrib(this->getWindow(), GLFW_ICONIFIED))
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        }
+        ImGui::SameLine(420);
+        ImGui::SetCursorPosY(4);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(255, 0, 0, 255));
+        if(ImGui::Button("x", ImVec2(30,30)))
+        {
+            glfwSetWindowShouldClose(this->getWindow(), GLFW_TRUE);
+        }
+        ImGui::PopStyleColor();
+        // Colonna sinistra: lista dispositivi
+        ImGui::BeginChild("left_panel", ImVec2(180, 300), true);
+        MIDIINCAPS caps;
+        static std::atomic<int> selected_device = 0; // 0 = MIDI Keyboard, 1 = Launchpad, 2 = MIDI Mixer
         if(currentDevCount > 0)
         {   
-            //dev.setMap(this->FuncitionMap);
-            ImGui::SetNextWindowPos(ImVec2(0, 0));
-            ImGui::SetNextWindowSize(ImVec2(450, 350));
-            float pad = 4.0f;
-            float button_size = 20.0f;
-            ImGui::Begin("Gestione MIDI", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
-            ImGui::Text("Midi Controller");
-            ImGui::SameLine(390);
-            ImGui::SetCursorPosY(4);
-            if(ImGui::Button("-", ImVec2(20,0)))
-            {
-                glfwIconifyWindow(this->getWindow());
-            }
-            if(glfwGetWindowAttrib(this->getWindow(), GLFW_ICONIFIED))
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(150));
-            }
-            ImGui::SameLine(420);
-            ImGui::SetCursorPosY(4);
-            if(ImGui::Button("x", ImVec2(20,0)))
-            {
-                glfwSetWindowShouldClose(this->getWindow(), GLFW_TRUE);
-            }
-            // Colonna sinistra: lista dispositivi
-            ImGui::BeginChild("left_panel", ImVec2(180, 300), true);
-            static std::atomic<int> selected_device = 0; // 0 = MIDI Keyboard, 1 = Launchpad, 2 = MIDI Mixer
-            MIDIINCAPS caps;
-            
             for (int i = 0; i < currentDevCount; i++)
             {
                 midiInGetDevCaps(i, &caps, sizeof(caps));
@@ -147,26 +149,34 @@ void UIController::start()
                         selected_device = i;
                 }
             }
-            ImGui::EndChild();
+        }else{
+            ImGui::SetCursorPosY(10);
+            ImGui::Text("No Device Found");
+        }
+        ImGui::EndChild();
 
-            ImGui::SameLine();
+        ImGui::SameLine();
 
-            // Colonna destra: dettagli dispositivo
-            ImGui::BeginChild("right_panel", ImVec2(253, 100), true);
-            ImGui::Text("Dispositivo: %s", (const char *)caps.szPname);
+        // Colonna destra: dettagli dispositivo
+        ImGui::BeginChild("right_panel", ImVec2(253, 100), true);
+        char *s = (currentDevCount > 0) ? (char *)caps.szPname : (char *)"No Device";
+        ImGui::Text("Dispositivo: %s", s);
 
-            if(connect)
-            {
-                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
-                ImGui::Text("Connesso");
-                ImGui::PopStyleColor();
-            }else{
-                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-                ImGui::Text("Disconnesso");
-                ImGui::PopStyleColor();
-            }
+        if(connect && currentDevCount > 0)
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
+            ImGui::Text("Connesso");
+            ImGui::PopStyleColor();
+        }else{
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+            ImGui::Text("Disconnesso");
+            ImGui::PopStyleColor();
+        }
 
-            ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(38, 42, 47, 255));
+        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(38, 42, 47, 255));
+        if(devCount > 0)
+        {
+
             const char *str = (connect == true) ? "Disconnetti" : "connetti";
             // Bottone disconnessione
             if (ImGui::Button(str, ImVec2(-1, 0)))
@@ -178,7 +188,7 @@ void UIController::start()
                     deviceMap[0].MidiClose();
                     std::cout << "dispositivo disconnesso" << std::endl;
                     connect = false;
-                }else{
+                }else if(connect == false && currentDevCount > 0){
                     deviceMap[selected_device].setId(selected_device);
                     MIDIINCAPS str = deviceMap[selected_device].getMidiStructure();
                     deviceMap[selected_device].setStructure(deviceMap[selected_device].getId(), deviceMap[selected_device].getMidiStructure());
@@ -194,51 +204,52 @@ void UIController::start()
                     connect = true;
                 }
             }
-            ImGui::PopStyleColor();
-            
-            ImGui::Spacing();
-            ImGui::EndChild();
-            ImGui::SetCursorPos(ImVec2(196,137));
-            ImGui::Text("Comandi disponibili:");
-            ImGui::SetCursorPos(ImVec2(196,160));
-            ImGui::BeginChild("functionPanel", ImVec2(252,174), true, ImGuiWindowFlags_NoScrollbar);
-
-            static int current_item = 0;
-            std::string testo;
-            int posText = 10;
-            int posCombo = 7;
-            for(auto& [Devicekey, Devicevalue] : deviceMap[selected_device].getMap())
-            {
-                testo = std::to_string(Devicekey) + ":";
-                ImGui::SetCursorPosY(posText);
-                ImGui::Text(testo.c_str());
-                ImGui::SameLine(80);
-                ImGui::SetNextItemWidth(160);
-                ImGui::SetCursorPosY(posCombo);
-                std::string c = std::string("##command ") + std::to_string(i);
-                if (ImGui::BeginCombo(c.c_str(), current_item_name.c_str(), ImGuiComboFlags_NoArrowButton))
-                {
-                    int idx = 0;
-                    for (auto& [Pluginkey, Pluginvalue] : PluginController::getNamesMap()) {
-                        bool is_selected = (current_item == idx);
-                        if (ImGui::Selectable(Pluginkey.c_str(), is_selected)) {
-                            current_item = idx;
-                            current_item_name = Pluginkey; // salva anche la stringa
-                        }
-                        if (is_selected)
-                            ImGui::SetItemDefaultFocus();
-                        idx++;
-                    }
-                    ImGui::EndCombo();
-                }
-                i++;
-                posText += 30;
-                posCombo += 30;
-            }
-
-            ImGui::EndChild();
-            ImGui::End();          
         }
+        ImGui::PopStyleColor();
+        
+        ImGui::Spacing();
+        ImGui::EndChild();
+        ImGui::SetCursorPos(ImVec2(196,137));
+        ImGui::Text("Comandi disponibili:");
+        ImGui::SetCursorPos(ImVec2(196,160));
+        ImGui::BeginChild("functionPanel", ImVec2(252,174), true, ImGuiWindowFlags_NoScrollbar);
+
+        static int current_item = 0;
+        std::string testo;
+        int posText = 10;
+        int posCombo = 7;
+        for(auto& [Devicekey, Devicevalue] : deviceMap[selected_device].getMap())
+        {
+            testo = std::to_string(Devicekey) + ":";
+            ImGui::SetCursorPosY(posText);
+            ImGui::Text(testo.c_str());
+            ImGui::SameLine(80);
+            ImGui::SetNextItemWidth(160);
+            ImGui::SetCursorPosY(posCombo);
+            std::string c = std::string("##command ") + std::to_string(i);
+            if (ImGui::BeginCombo(c.c_str(), current_item_name.c_str(), ImGuiComboFlags_NoArrowButton))
+            {
+                int idx = 0;
+                for (auto& [Pluginkey, Pluginvalue] : PluginController::getNamesMap()) {
+                    bool is_selected = (current_item == idx);
+                    if (ImGui::Selectable(Pluginkey.c_str(), is_selected)) {
+                        current_item = idx;
+                        current_item_name = Pluginkey; // salva anche la stringa
+                    }
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                    idx++;
+                }
+                ImGui::EndCombo();
+            }
+            i++;
+            posText += 30;
+            posCombo += 30;
+        }
+
+        ImGui::EndChild();
+        ImGui::End();          
+
         
             
         // renderizzo la finestra
