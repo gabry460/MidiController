@@ -1,1 +1,5 @@
-log.txt
+/log.txt
+/Bin/Debug/log.txt
+/Bin/Relese/log.txt
+/Relese.bat
+/Debug.bat
