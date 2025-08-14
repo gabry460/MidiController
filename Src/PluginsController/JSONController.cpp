@@ -1,7 +1,4 @@
-#include <fstream>
 #include <filesystem>
-#include <iostream>
-#include "json.hpp"
 #include "JSONController.hpp"
 
 std::filesystem::path JSONController::jsonPath = "../../Plugins/Plugins.json";

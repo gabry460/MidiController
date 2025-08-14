@@ -1,14 +1,9 @@
 #include <iostream>
-#include <glfw3.h>
-#include <windows.h>
-#include <thread>
-#include <atomic>
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
 #include "imgui.h"
 #include "json.hpp"
 #include "PluginController.hpp"
-#include <unordered_map>
 #include "UIController.hpp"
 #include "LogController.hpp"
 
@@ -26,7 +21,7 @@ int UIController::Init()
     {
         return -1;
     }
-    // Configura OpenGL 3.3 core
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -108,6 +103,10 @@ void UIController::start()
         ImGui::NewFrame();
         
         UINT currentDevCount = devCount.load();
+        int state = glfwGetMouseButton(this->getWindow(), GLFW_MOUSE_BUTTON_LEFT);
+
+        //glfwGetCursorPos(this->getWindow(), &curX, &curY);
+
 
         //dev.setMap(this->FuncitionMap);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -115,6 +114,7 @@ void UIController::start()
         float pad = 4.0f;
         float button_size = 20.0f;
         ImGui::Begin("Gestione MIDI", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
+
         ImGui::Text("Midi Controller");
         ImGui::SameLine(388);
         ImGui::SetCursorPosY(4);
@@ -154,7 +154,6 @@ void UIController::start()
             ImGui::Text("No Device Found");
         }
         ImGui::EndChild();
-
         ImGui::SameLine();
 
         // Colonna destra: dettagli dispositivo

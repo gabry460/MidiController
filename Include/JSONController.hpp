@@ -11,8 +11,9 @@
 class JSONController{
     private:
         static std::filesystem::path jsonPath;
-    public:
         static nlohmann::json j;
+    public:
+        static nlohmann::json &getJ(){return j;}
         static void Init();
         static void writeDefaults(std::ofstream& jsonFile);
 

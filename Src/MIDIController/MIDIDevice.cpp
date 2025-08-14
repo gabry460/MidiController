@@ -1,7 +1,6 @@
+#include <thread>
 #include "MIDIDevice.hpp"
 #include "PluginController.hpp"
-#include <thread>
-#include <windows.h>
 
 /*
     creo una funzione che apre un dispositivo MIDI
@@ -20,7 +19,7 @@ void MIDI::open()
     }
     if(result != MMSYSERR_NOERROR) {
         std::cerr << "[-] Errore in midiInOpen: codice " << result << std::endl;
-        this->midiHandle = nullptr; // Protezione extra
+        this->midiHandle = nullptr; 
     }
 }
 
@@ -39,6 +38,7 @@ void CALLBACK MIDI::MidiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance,
         std::cout << "Inserisco nuovo control: " << (int)control << std::endl;
         pThis->getMap().insert_or_assign((int)control, nullptr);
     }
+    
     switch(control)
     {
         case 71:
