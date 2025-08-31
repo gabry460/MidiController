@@ -39,17 +39,11 @@ void CALLBACK MIDI::MidiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance,
         pThis->getMap().insert_or_assign((int)control, nullptr);
     }
     
-    switch(control)
+    for(auto& [key, value] : pThis->getMap())
     {
-        case 71:
-            for(auto& f : PluginController::getNamesMap())
-            {
-                if (f.second)
-                {
-                    f.second((int)control, (int)data, (int)state);
-                } 
-            }
-            break;
+        if(control == key && value) {
+            value(control, data, state);
+        }
     }
 
 }

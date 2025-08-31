@@ -27,6 +27,6 @@ void JSONController::Init()
 */
 void JSONController::writeDefaults(std::ofstream& jsonFile)
 {
-    JSONController::j["Volume.dll"] = {"Volume"};
+    JSONController::j["Volume.dll"] = {"Volume", "StopAudio", "NextTrack", "PrevTrack", "VolumeUp", "VolumeDown", "Mute", "Zoom"};
     jsonFile << JSONController::j.dump(4);
 }

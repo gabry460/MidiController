@@ -55,3 +55,66 @@ extern "C" __declspec(dllexport) void Volume(int Control, int Data, int State)
     pEnumerator->Release();
     CoUninitialize();
 }
+
+extern "C" __declspec(dllexport) void StopAudio(int Control, int Data, int State)
+{
+    if(State == 137)
+    {
+        keybd_event(VK_MEDIA_PLAY_PAUSE, 0, 0, 0);  
+        keybd_event(VK_MEDIA_PLAY_PAUSE, 0, KEYEVENTF_KEYUP, 0);
+    }
+}
+
+extern "C" __declspec(dllexport) void NextTrack(int Control, int Data, int State)
+{
+    if(State == 137)
+    {
+        keybd_event(VK_MEDIA_NEXT_TRACK, 0, 0, 0);  
+        keybd_event(VK_MEDIA_NEXT_TRACK, 0, KEYEVENTF_KEYUP, 0);
+    }
+}
+
+extern "C" __declspec(dllexport) void PrevTrack(int Control, int Data, int State)
+{
+    if(State == 137)
+    {
+        keybd_event(VK_MEDIA_PREV_TRACK, 0, 0, 0);  
+        keybd_event(VK_MEDIA_PREV_TRACK, 0, KEYEVENTF_KEYUP, 0);
+    }
+}
+
+extern "C" __declspec(dllexport) void VolumeUp(int Control, int Data, int State)
+{
+    if(State == 137)
+    {
+        keybd_event(VK_VOLUME_UP, 0, 0, 0);  
+        keybd_event(VK_VOLUME_UP, 0, KEYEVENTF_KEYUP, 0);
+    }
+}
+
+extern "C" __declspec(dllexport) void VolumeDown(int Control, int Data, int State)
+{
+    if(State == 137)
+    {
+        keybd_event(VK_VOLUME_DOWN, 0, 0, 0);  
+        keybd_event(VK_VOLUME_DOWN, 0, KEYEVENTF_KEYUP, 0);
+    }
+}
+
+extern "C" __declspec(dllexport) void Zoom(int Control, int Data, int State)
+{
+    if(State == 137)
+    {
+        keybd_event(VK_ZOOM, 0, 0, 0);  
+        keybd_event(VK_ZOOM, 0, KEYEVENTF_KEYUP, 0);
+    }
+}
+
+extern "C" __declspec(dllexport) void Mute(int Control, int Data, int State)
+{
+    if(State == 137)
+    {
+        keybd_event(VK_VOLUME_MUTE, 0, 0, 0);  
+        keybd_event(VK_VOLUME_MUTE, 0, KEYEVENTF_KEYUP, 0);
+    }
+}

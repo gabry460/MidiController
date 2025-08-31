@@ -9,8 +9,8 @@
 
 std::thread t1;
 std::atomic<bool> threadRunning = true;
+std::unordered_map<std::string, std::string> comboMap;
 std::string current_item_name = "Nessuna";
-int i = 0;
 
 /*
     creo una funzione che inizializza l'UI
@@ -66,7 +66,7 @@ int UIController::createWindow(int width, int height, const char *title)
 }
 
 /*
-    creo una funzione che fa partire la visualizzazione della finestra di imgui
+creo una funzione che fa partire la visualizzazione della finestra di imgui
 */
 void UIController::start()
 {
@@ -74,7 +74,8 @@ void UIController::start()
     PluginController::Init();
     LogController::Init();
     std::atomic<UINT> devCount = 0;
-    
+    int i;
+
     t1 = std::thread([&devCount]()->void{
         while(threadRunning)
         {
@@ -217,6 +218,7 @@ void UIController::start()
         std::string testo;
         int posText = 10;
         int posCombo = 7;
+        i = 0;
         for(auto& [Devicekey, Devicevalue] : deviceMap[selected_device].getMap())
         {
             testo = std::to_string(Devicekey) + ":";
@@ -225,15 +227,28 @@ void UIController::start()
             ImGui::SameLine(80);
             ImGui::SetNextItemWidth(160);
             ImGui::SetCursorPosY(posCombo);
-            std::string c = std::string("##command ") + std::to_string(i);
-            if (ImGui::BeginCombo(c.c_str(), current_item_name.c_str(), ImGuiComboFlags_NoArrowButton))
+            std::string c = std::string("##command ") + std::to_string(Devicekey);
+            comboMap.try_emplace(c, "Nessuna");
+            if (ImGui::BeginCombo(c.c_str(), comboMap.at(c).c_str(), ImGuiComboFlags_NoArrowButton))
             {
                 int idx = 0;
                 for (auto& [Pluginkey, Pluginvalue] : PluginController::getNamesMap()) {
                     bool is_selected = (current_item == idx);
                     if (ImGui::Selectable(Pluginkey.c_str(), is_selected)) {
                         current_item = idx;
-                        current_item_name = Pluginkey; // salva anche la stringa
+                        comboMap[c] = Pluginkey;
+                        deviceMap[selected_device].getMap().insert_or_assign(Devicekey, Pluginvalue);
+                        for(auto& [key, value] : deviceMap[currentDevCount].getMap())
+                        {
+                            if(value == NULL)
+                            {
+                                std::cout << "key: " << key << " value: NULL";
+                            }else{
+                                std::cout << "key: " << key << " value: Puntatore";
+                            }
+                        }
+                        std::cout << std::endl;
+                        
                     }
                     if (is_selected)
                         ImGui::SetItemDefaultFocus();
@@ -241,7 +256,6 @@ void UIController::start()
                 }
                 ImGui::EndCombo();
             }
-            i++;
             posText += 30;
             posCombo += 30;
         }
@@ -254,14 +268,14 @@ void UIController::start()
         // renderizzo la finestra
         ImGui::Render();
         int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glfwGetFramebufferSize(this->getWindow(), &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
         glClearColor(0.0862745098039216f, 0.0980392f, 0.11372549f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(this->getWindow());
     }
 }
 
@@ -271,6 +285,7 @@ void UIController::start()
 */
 UIController::~UIController()
 {
+
     threadRunning = false;
     if(t1.joinable())
     {
