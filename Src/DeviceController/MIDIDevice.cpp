@@ -69,7 +69,7 @@ void MIDI::Start()
     if(res == MMSYSERR_INVALHANDLE)
     {
         std::cerr << "[-] Invalid Handle" << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(4));
+        Sleep(4000);
         exit(EXIT_FAILURE);
     }
 }

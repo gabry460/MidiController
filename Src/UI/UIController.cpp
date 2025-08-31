@@ -91,7 +91,7 @@ void UIController::start()
                 }
             }
             devCount = count;
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            Sleep(1000);
         }
     });
     
@@ -125,7 +125,7 @@ void UIController::start()
         }
         if(glfwGetWindowAttrib(this->getWindow(), GLFW_ICONIFIED))
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(150));
+            Sleep(150);
         }
         ImGui::SameLine(420);
         ImGui::SetCursorPosY(4);
@@ -198,7 +198,7 @@ void UIController::start()
                     this->t0 = std::thread([&deviceMap = deviceMap, this]() {
                         while (running) {
                             deviceMap[selected_device].Start();
-                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                            Sleep(10);
                         }
                     });
                     connect = true;
