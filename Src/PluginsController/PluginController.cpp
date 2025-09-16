@@ -15,40 +15,46 @@ void PluginController::Init()
 {
     std::cout << "[+] sto inizializzando i plugin.." << std::endl;
     int counter = 0;
-    try {
-        // cerco tutti i file dei plugins (escluso Plugins.json) 
-        for (auto const& entry : std::filesystem::directory_iterator(PluginController::getPluginPath())) {
-            if (entry.is_regular_file() && entry.path().filename() != "Plugins.json") {
+    try
+    {
+        // cerco tutti i file dei plugins (escluso Plugins.json)
+        for (auto const &entry : std::filesystem::directory_iterator(PluginController::getPluginPath()))
+        {
+            if (entry.is_regular_file() && entry.path().filename() != "Plugins.json")
+            {
                 counter++;
             }
         }
-        if(counter == 0)
+        if (counter == 0)
         {
             std::cout << "[-] nessun plugin trovato all'interno della directory ./Plugins.. Installa dei plugins e riprova" << std::endl;
             exit(0);
         }
-        else{
+        else
+        {
             std::cout << "[+] " << counter << " plugins trovati:" << std::endl;
             // ogni nome del file lo inserisco in un vettore
-            for (auto const& entry : std::filesystem::directory_iterator(PluginController::getPluginPath())) 
+            for (auto const &entry : std::filesystem::directory_iterator(PluginController::getPluginPath()))
             {
-                if (entry.is_regular_file() && entry.path().filename() != "Plugins.json") {
+                if (entry.is_regular_file() && entry.path().filename() != "Plugins.json")
+                {
                     PluginController::getFileNames().push_back(entry.path().filename().string());
                 }
             }
             // stampo tutto il vettore
-            for(int i = 0; i < PluginController::getFileNames().size(); i++)
+            for (int i = 0; i < PluginController::getFileNames().size(); i++)
             {
                 std::cout << "[->]  " << PluginController::getFileNames()[i] << std::endl;
             }
             LoadPlugins(PluginController::getFileNames(), PluginController::getNamesMap());
             PluginController::getNamesMap().insert_or_assign("Nessuna", nullptr);
         }
-    } catch (std::filesystem::filesystem_error const& ex) {
+    }
+    catch (std::filesystem::filesystem_error const &ex)
+    {
         std::cerr << "[-] Errore: " << ex.what() << "\n";
         return;
     }
-
 }
 
 /*
@@ -62,18 +68,22 @@ static void LoadPlugins(std::vector<std::string> filesNames, std::unordered_map<
     // inizializzo il file json
     JSONController::Init();
     // per ogni file carico la rispettiva funzione e la inserisco nella NamesMap
-    for (auto& [key, value] : JSONController::getJ().items()) {
+    for (auto &[key, value] : JSONController::getJson().items())
+    {
         std::string c = "../../Plugins/" + key;
         HMODULE lib = LoadLibraryA(c.c_str());
-        for (const auto& func : value) {
+        for (const auto &func : value)
+        {
             void (*Func)(int, int, int) = (void (*)(int, int, int))GetProcAddress(lib, func.get<std::string>().c_str());
-            if (Func) {
+            if (Func)
+            {
                 NamesMap.insert_or_assign(func.get<std::string>(), Func);
-            } else {
+            }
+            else
+            {
                 std::cerr << "[-] Funzione non trovata: " << func.get<std::string>().c_str() << std::endl;
             }
         }
     }
     std::cout << "[+] plugin caricati correttamente" << std::endl;
-
 }
