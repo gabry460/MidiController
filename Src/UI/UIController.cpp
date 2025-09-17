@@ -6,6 +6,8 @@
 #include "PluginController.hpp"
 #include "UIController.hpp"
 #include "LogController.hpp"
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <glfw3native.h>
 
 std::thread t1;
 std::atomic<bool> threadRunning = true;
@@ -75,6 +77,8 @@ void UIController::start()
     PluginController::Init();
     LogController::Init();
     std::atomic<UINT> devCount = 0;
+    double curX;
+    double curY;
 
     t1 = std::thread([&devCount]() -> void
                      {
@@ -95,6 +99,7 @@ void UIController::start()
             Sleep(1000);
         } });
 
+    int c = 0;
     // ciclo principale della finestra
     while (!glfwWindowShouldClose(window))
     {
@@ -104,31 +109,19 @@ void UIController::start()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        double curX;
-        double curY;
-        glfwGetCursorPos(this->getWindow(), &curX, &curY);
-        if (curX <= 100 && curY <= 30)
+        // logica per il riposizionamento della finestra
+
+        glfwGetCursorPos(this->window, &curX, &curY);
+        if (!glfwGetWindowAttrib(this->getWindow(), GLFW_ICONIFIED) && curX <= 385 && curY <= 40 && glfwGetMouseButton(this->getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
-            if (glfwGetMouseButton(this->getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-            {
-                dragging = true;
-            }
-            else if (glfwGetMouseButton(this->getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-            {
-                dragging = false;
-            }
-            if (dragging == true)
-            {
-                glfwSetWindowPos(this->window, curX, curY);
-            }
+            HWND hwnd = glfwGetWin32Window(window);
+            ReleaseCapture();
+            SendMessage(hwnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);
         }
 
         UINT currentDevCount = devCount.load();
         int state = glfwGetMouseButton(this->getWindow(), GLFW_MOUSE_BUTTON_LEFT);
 
-        // glfwGetCursorPos(this->getWindow(), &curX, &curY);
-
-        // dev.setMap(this->FuncitionMap);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowSize(ImVec2(450, 350));
         float pad = 4.0f;
