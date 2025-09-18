@@ -117,6 +117,8 @@ void UIController::start()
             HWND hwnd = glfwGetWin32Window(window);
             ReleaseCapture();
             SendMessage(hwnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
         }
 
         UINT currentDevCount = devCount.load();
