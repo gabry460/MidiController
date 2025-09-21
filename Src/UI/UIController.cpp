@@ -3,6 +3,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui.h"
 #include "json.hpp"
+#include "compileMode.hpp"
 #include "PluginController.hpp"
 #include "UIController.hpp"
 #include "LogController.hpp"
@@ -35,7 +36,12 @@ int UIController::Init()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
+
+#ifdef RELEASE
+    io.Fonts->AddFontFromFileTTF("./font/arial.ttf", 20.0f);
+#else
     io.Fonts->AddFontFromFileTTF("./../../font/arial.ttf", 20.0f);
+#endif
     ImGui::StyleColorsClassic();
     ImVec4 *colors = ImGui::GetStyle().Colors;
     ImVec4 titleColor = ImVec4(0.0862745098039216f, 0.0941176470588235f, 0.1098039215686275f, 1.00f);
@@ -109,7 +115,7 @@ void UIController::start()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // logica per il riposizionamento della finestra
+        // logica per il dragging della finestra
 
         glfwGetCursorPos(this->window, &curX, &curY);
         if (!glfwGetWindowAttrib(this->getWindow(), GLFW_ICONIFIED) && curX <= 385 && curY <= 40 && glfwGetMouseButton(this->getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)

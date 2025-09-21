@@ -70,7 +70,8 @@ static void LoadPlugins(std::vector<std::string> filesNames, std::unordered_map<
     // per ogni file carico la rispettiva funzione e la inserisco nella NamesMap
     for (auto &[key, value] : JSONController::getJson().items())
     {
-        std::string c = "../../Plugins/" + key;
+
+        std::string c = "Plugins/" + key;
         HMODULE lib = LoadLibraryA(c.c_str());
         for (const auto &func : value)
         {

@@ -1,7 +1,13 @@
 #include <filesystem>
 #include "JSONController.hpp"
+#include "compileMode.hpp"
 
-std::filesystem::path JSONController::jsonPath = "../../Plugins/Plugins.json";
+#ifdef RELEASE
+std::filesystem::path JSONController::jsonPath = "./Plugins/Plugins.json";
+#else
+std::filesystem::path JSONController::jsonPath = "./../../Plugins/Plugins.json";
+
+#endif
 std::vector<std::string> functionArray = {};
 nlohmann::json JSONController::json;
 
